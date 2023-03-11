@@ -16,14 +16,33 @@ class Collider extends Script {
    */
   getDistCollisions(parent, obj) {
 
-    const dist_x_left = parent.x + parent.width - obj.x;
-
+    const dist_x_left = -(parent.x + parent.width - obj.x);
     const dist_x_right = obj.x + obj.width - parent.x;
+    const dist_y_top = -(parent.y + parent.height - obj.y);
+    const dist_y_bottom = obj.y + obj.height - parent.y;
 
-    console.log(dist_x_left, dist_x_right)
+    if (
+      Math.abs(dist_x_left) < Math.abs(dist_x_right) &&
+      Math.abs(dist_x_left) < Math.abs(dist_y_top) &&
+      Math.abs(dist_x_left) < Math.abs(dist_y_bottom)
+    )
+      return { dist: dist_x_left, dir: "x" };
+    else if (
+      Math.abs(dist_x_right) < Math.abs(dist_x_left) &&
+      Math.abs(dist_x_right) < Math.abs(dist_y_top) &&
+      Math.abs(dist_x_right) < Math.abs(dist_y_bottom)
+    )
+      return { dist: dist_x_right, dir: "x" };
+    else if (
+      Math.abs(dist_y_top) < Math.abs(dist_x_left) &&
+      Math.abs(dist_y_top) < Math.abs(dist_x_right) &&
+      Math.abs(dist_y_top) < Math.abs(dist_y_bottom)
+    )
+      return { dist: dist_y_top, dir: "y" };
+    else
+      return { dist: dist_y_bottom, dir: "y" };
 
   }
-
 
   collisionCheck() {
     const gameObjects = GameManager.objects.filter((ob) => ob.id !== this.parent.id).filter(obj => obj.scripts.find(v => v instanceof Collider));
@@ -33,12 +52,8 @@ class Collider extends Script {
      */
     const rigidbody = this.parent.getScript(RigidBody);
 
-    for (const obj of gameObjects) {
-      console.log(this.getDistCollisions({
-        x: parent.velocity.x === Math.abs(parent.velocity.x) ? 1 : -1,
-        y: parent.velocity.y === Math.abs(parent.velocity.y) ? 1 : -1,
-      }, parent, obj));
 
+    for (const obj of gameObjects) {
       // gotta decide which type to do
       // if the body is "above" and fully "inbetween" the obj do y otherwise x?
       if (
@@ -48,13 +63,16 @@ class Collider extends Script {
         && (parent.x + parent.width >= obj.x)
         && (parent.x <= obj.x + obj.width)
       ) {
-        if (parent.velocity.y !== Math.abs(parent.velocity.y)) {
-          parent.velocity.set(parent.velocity.x, 0);
-          parent.y = obj.y + obj.height;
-        } else {
-          parent.velocity.set(parent.velocity.x, 0);
-          parent.y -= (parent.y + parent.height - obj.y);
-          rigidbody.isGrounded = true;
+        const values = this.getDistCollisions(parent, obj);
+
+        if (values !== undefined) {
+          parent[values.dir] += values.dist;
+          if (values.dir === "x")
+            parent.velocity.x = 0;
+          else {
+            parent.velocity.y = 0;
+            rigidbody.isGrounded = true;
+          }
         }
       }
 

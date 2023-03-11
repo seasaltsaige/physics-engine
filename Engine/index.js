@@ -9,7 +9,7 @@ window.onload = () => {
   const ctx = Window.getContext("2d");
 
   const block = new Square({
-    x: 100,
+    x: Window.width / 2,
     y: 100,
     width: 100,
     height: 100,
@@ -38,7 +38,7 @@ window.onload = () => {
 
   const floor2 = new Square({
     x: Window.width / 2,
-    y: Window.height * 2 / 3 - 350,
+    y: Window.height * 2 / 3 - 150,
     height: 50,
     width: 300,
     z_index: 1,
