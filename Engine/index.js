@@ -38,7 +38,7 @@ window.onload = () => {
 
   const floor2 = new Square({
     x: Window.width / 2,
-    y: Window.height * 2 / 3 - 150,
+    y: Window.height * 2 / 3 - 225,
     height: 50,
     width: 300,
     z_index: 1,
