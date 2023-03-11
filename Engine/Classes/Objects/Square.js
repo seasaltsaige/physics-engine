@@ -1,17 +1,12 @@
 class Square extends GameObject {
 
-  /**
-   * @type {RigidBody | undefined}
-   */
-  rigidBody;
-
-  constructor(x, y, width, height, color) {
-    super(x, y, width, height, color);
+  constructor({ x, y, width, height, z_index, color }) {
+    super({ x, y, width, height, z_index, color });
   }
 
+
   onRender() {
-    if (this.rigidBody !== undefined)
-      this.rigidBody.run();
+    super.onRender();
   }
 
 }

@@ -10,6 +10,6 @@ class Script {
     this.parent = parent;
   }
 
-  run() {
-  }
+  run() { }
+  onLoad() { }
 }
