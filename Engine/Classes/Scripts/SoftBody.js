@@ -35,10 +35,8 @@ class SoftBody extends Script {
 
   run() {
 
-    /**
-     * @type {SoftBodyCollider | null}
-     */
-    const collider = this.parent.getScript(SoftBodyCollider);
+
+
 
 
     // Physics MOVEMENT
@@ -49,13 +47,15 @@ class SoftBody extends Script {
       p.y += p.velocity.y;
     }
     this.parent.velocity.add(0, this.gravity);
+    this.parent.updateBoundingBox();
 
-    for (const k in this.parent.boundingBox) {
-      const p = this.parent.boundingBox[k];
-      p.x += this.parent.velocity.x;
-      p.y += this.parent.velocity.y;
+    /**
+     * @type {SoftBodyCollider | null}
+     */
+    const collider = this.parent.getScript(SoftBodyCollider);
+    if (collider !== null) {
+      collider.collisionCheck();
     }
-
     // console.log("Im a softbody physics object");
   }
 

@@ -26,7 +26,21 @@ class SoftBodyObject extends GameObject {
   }
 
   onLoad() {
-    // console.log(this.points);
+    // set initial distances to points
+    for (const point of this.points) {
+      for (const p of this.points.filter(v => v.x !== point.x && v.y !== point.y)) {
+        point.distToOtherPoints.push(
+          { x: p.x - point.x, y: p.y - point.y },
+        )
+      }
+    }
+
+    console.log(this.points);
+
+    this.updateBoundingBox();
+  }
+
+  updateBoundingBox() {
     let min_x = Infinity;
     let max_x = -Infinity;
     let min_y = Infinity;
@@ -46,7 +60,6 @@ class SoftBodyObject extends GameObject {
       bottom_right: { x: max_x, y: max_y },
     };
   }
-
 
 
   onRender() {

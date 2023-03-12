@@ -11,10 +11,7 @@ window.onload = () => {
   const soft = new SoftBodyObject({
     color: "black",
     x: 500,
-    y: 500,
-    // bounding box --- I should calculate this manually
-    height: 200,
-    width: 200,
+    y: 200,
     //----
     points: [
       { x: 23, y: 0 },
