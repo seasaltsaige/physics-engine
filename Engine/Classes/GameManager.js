@@ -74,18 +74,18 @@ class GameManager {
 
       const ctx = GameManager.ctx;
 
-      // ctx.strokeStyle = "red";
-      // ctx.lineWidth = 3;
-      // // ctx.moveTo(object.x, object.y);
-      // ctx.beginPath();
-      // ctx.moveTo(obj.boundingBox.top_left.x, obj.boundingBox.top_left.y);
-      // ctx.lineTo(obj.boundingBox.top_right.x, obj.boundingBox.top_right.y);
-      // ctx.lineTo(obj.boundingBox.bottom_right.x, obj.boundingBox.bottom_right.y);
-      // ctx.lineTo(obj.boundingBox.bottom_left.x, obj.boundingBox.bottom_left.y);
-      // ctx.lineTo(obj.boundingBox.top_left.x, obj.boundingBox.top_left.y);
+      ctx.strokeStyle = "red";
+      ctx.lineWidth = 3;
+      // ctx.moveTo(object.x, object.y);
+      ctx.beginPath();
+      ctx.moveTo(obj.boundingBox.top_left.x, obj.boundingBox.top_left.y);
+      ctx.lineTo(obj.boundingBox.top_right.x, obj.boundingBox.top_right.y);
+      ctx.lineTo(obj.boundingBox.bottom_right.x, obj.boundingBox.bottom_right.y);
+      ctx.lineTo(obj.boundingBox.bottom_left.x, obj.boundingBox.bottom_left.y);
+      ctx.lineTo(obj.boundingBox.top_left.x, obj.boundingBox.top_left.y);
 
-      // ctx.closePath();
-      // ctx.stroke();
+      ctx.closePath();
+      ctx.stroke();
 
       ctx.fillStyle = obj.color;
 
@@ -106,8 +106,20 @@ class GameManager {
       }
       ctx.lineTo(obj.points[0].x, obj.points[0].y);
       ctx.closePath();
-      ctx.fill();
+      ctx.stroke();
 
+      ctx.strokeStyle = "red";
+
+      // for (const spring of obj.springs) {
+      //   ctx.beginPath();
+      //   ctx.moveTo(spring.points[0].x, spring.points[0].y);
+      //   ctx.lineTo(spring.points[1].x, spring.points[1].y);
+      //   ctx.closePath();
+
+      //   ctx.lineWidth = spring.calculateForce() / 10 || 1;
+      //   ctx.stroke();
+
+      // }
 
 
       // object.screen_x = object.x + GameManager.screenPos.x;

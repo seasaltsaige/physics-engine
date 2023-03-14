@@ -9,6 +9,36 @@ window.onload = () => {
   const ctx = Window.getContext("2d");
 
 
+  const rect = new SoftBodyObject({
+    color: "black",
+    x: 100,
+    y: 100,
+    points: [
+      { y: 0, x: 200 },
+      { y: 100, x: 200 },
+      { y: 200, x: 200 },
+      { y: 300, x: 200 },
+      { y: 400, x: 200 },
+      { y: 500, x: 200 },
+      { y: 600, x: 200 },
+      { y: 600, x: 100 },
+      { y: 500, x: 100 },
+      { y: 400, x: 100 },
+      { y: 300, x: 100 },
+      { y: 200, x: 100 },
+      { y: 100, x: 100 },
+      { y: 0, x: 100 },
+    ],
+    mass: 400,
+    k_constant: 60,
+    z_index: 1,
+  });
+
+  rect.appendScripts([
+    new SoftBody(rect, { fixed: false, elasticity: 0.8 }),
+    new SoftBodyCollider(rect),
+  ]);
+
   const circlePoints = [];
   const pAmmount = 3;
   const step = Math.PI * 2 / pAmmount;
@@ -18,9 +48,9 @@ window.onload = () => {
     const y = Math.sin(i) * 70;
     circlePoints.push({ x, y });
   }
-
-  // have to make both objects points react
-
+  //------------------
+  // // have to make both objects points react
+  //------------------
   const soft = new SoftBodyObject({
     color: "black",
     x: 800,
@@ -36,10 +66,11 @@ window.onload = () => {
     new SoftBodyCollider(soft),
   ]);
 
+
   const soft2 = new SoftBodyObject({
     color: "black",
-    x: 800,
-    y: Window.height * 2 / 3 - 100,
+    x: 400,
+    y: 400,
     points: circlePoints,
     mass: 50,
     k_constant: 10,
@@ -50,6 +81,22 @@ window.onload = () => {
     new SoftBody(soft2, { fixed: false, elasticity: 0.575 }),
     new SoftBodyCollider(soft2),
   ]);
+
+
+  // const soft2 = new SoftBodyObject({
+  //   color: "black",
+  //   x: 800,
+  //   y: Window.height * 2 / 3 - 100,
+  //   points: circlePoints,
+  //   mass: 50,
+  //   k_constant: 10,
+  //   z_index: 1,
+  // });
+
+  // soft2.appendScripts([
+  //   new SoftBody(soft2, { fixed: false, elasticity: 0.575 }),
+  //   new SoftBodyCollider(soft2),
+  // ]);
 
   // const block = new Square({
   //   x: Window.width / 2,
@@ -73,11 +120,12 @@ window.onload = () => {
     color: "brown",
     points: [
       { x: 0, y: 0 },
-      { x: Window.width, y: -50 },
+      { x: Window.width, y: -300 },
       { x: Window.width + 50, y: 50 },
       { x: 0, y: 50 },
     ],
-    mass: 100,
+    mass: 1,
+    k_constant: 1,
   });
 
   floor.appendScripts([
@@ -100,9 +148,9 @@ window.onload = () => {
   GameManager.ctx = ctx;
   GameManager.width = Window.width;
   GameManager.height = Window.height;
+  GameManager.addObject(rect);
   GameManager.addObject(soft);
   GameManager.addObject(soft2);
-  // GameManager.addObject(block);
   GameManager.addObject(floor);
   // GameManager.addObject(floor2);
 

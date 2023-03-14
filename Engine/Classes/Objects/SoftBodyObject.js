@@ -47,21 +47,80 @@ class SoftBodyObject extends GameObject {
     const first = this.points[0];
     const last = this.points[this.points.length - 1];
 
-    for (let inc = 1; inc < this.points.length - 1; inc++) {
-      for (let i = 0; i < this.points.length - inc; i += 1) {
-        const p1 = this.points[i];
-        const p2 = this.points[i + inc];
+    // for (let inc = 1; inc < this.points.length - 1; inc++) {
+    //   for (let i = 0; i < this.points.length - inc; i += 1) {
+    //     const p1 = this.points[i];
+    //     const p2 = this.points[i + inc];
+
+    //     this.springs.push(
+    //       new SoftBodySpring(
+    //         [p1, p2], this.k_constant
+    //       )
+    //     )
+    //   }
+    // }
+
+    for (let i = 0; i < this.points.length / 2; i++) {
+      // console.log(i, this.points.length - i);
+      this.springs.push(
+        new SoftBodySpring(
+          [
+            this.points[i],
+            this.points[this.points.length - i - 1]
+          ],
+          this.k_constant,
+        )
+      );
+
+      if (i !== this.points.length / 2 - 1) {
+        this.springs.push(
+          new SoftBodySpring(
+            [
+              this.points[i],
+              this.points[i + 1]
+            ],
+            this.k_constant
+          )
+        );
 
         this.springs.push(
           new SoftBodySpring(
-            [p1, p2], this.k_constant
+            [
+              this.points[this.points.length - i - 1],
+              this.points[this.points.length - i - 2],
+            ],
+            this.k_constant
+          )
+        )
+
+        this.springs.push(
+          new SoftBodySpring(
+            [
+              this.points[i],
+              this.points[this.points.length - i - 2],
+            ],
+            this.k_constant
           )
         )
       }
+
+      if (i > 0) {
+        this.springs.push(
+          new SoftBodySpring(
+            [
+              this.points[i],
+              this.points[this.points.length - i],
+            ],
+            this.k_constant
+          )
+        )
+      }
+
+
     }
 
-    this.springs.push(new SoftBodySpring([last, first], this.k_constant));
-    this.updateBoundingBox();
+    // this.springs.push(new SoftBodySpring([last, first], this.k_constant));
+    // this.updateBoundingBox();
   }
 
   updateBoundingBox() {
@@ -91,8 +150,7 @@ class SoftBodyObject extends GameObject {
     /**
      * @type {SoftBody}
      */
-    const sb = this.getScript(SoftBody);
-    if (sb.fixed) return;
+
     for (const spring of this.springs) {
       const p1 = this.points.find(v => v.x === spring.points[0].x && v.y === spring.points[0].y);
       const p2 = this.points.find(v => v.x === spring.points[1].x && v.y === spring.points[1].y);
@@ -121,7 +179,8 @@ class SoftBodyObject extends GameObject {
       p1.velocity.add(p1v_x, p1v_y);
       p2.velocity.add(p2v_x, p2v_y);
     }
-
+    const sb = this.getScript(SoftBody);
+    if (sb.fixed) return;
 
   }
 

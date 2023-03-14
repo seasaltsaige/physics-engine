@@ -31,6 +31,8 @@ class SoftBodyCollider extends Script {
 
         // ONLY UPDATE IF DISTANCE IS CLOSER
         let { closest_x, closest_y } = { closest_x: 100000000, closest_y: 100000000 };
+        // GOTTA MAKE THESE TWO POINTS REACT AS WELL
+        // IF THE PLATFORM IS FIXED, HOPEFULLY IT DOESNT FREAK OUT
         let { x1_collided, y1_collided } = { x1_collided: null, y1_collided: null };
         let { x2_collided, y2_collided } = { x1_collided: null, y1_collided: null };
 
@@ -58,8 +60,11 @@ class SoftBodyCollider extends Script {
         }
 
         if (collided) {
-          point.x = closest_x;
-          point.y = closest_y;
+
+          const { halfx, halfy } = { halfx: Math.abs(closest_x + point.x) / 2, halfy: Math.abs(closest_y + point.y) / 2 }
+
+          point.x = halfx;
+          point.y = halfy;
 
           /**
            * @type {SoftBody}
@@ -71,11 +76,11 @@ class SoftBodyCollider extends Script {
             const angle = Math.asin(height / length);
 
             const curVelocityMAG = Math.sqrt(Math.pow(point.velocity.x, 2) + Math.pow(point.velocity.y, 2));
-            // console.log(curVelocityMAG);
 
             let newXVel = Math.cos(angle - Math.PI / 2);
             if (y2_collided < y1_collided) newXVel = -newXVel;
             const newYVel = Math.sin(Math.PI / 2 - angle);
+
             point.velocity.set(newXVel * curVelocityMAG * sb.elasticity, -newYVel * curVelocityMAG * sb.elasticity);
           }
 
@@ -87,15 +92,7 @@ class SoftBodyCollider extends Script {
 
         //   // make not collided
       }
-
-
-
-
     }
-
-
-    // for (const )
-
   }
 
 
