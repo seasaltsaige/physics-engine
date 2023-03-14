@@ -13,11 +13,28 @@ class SoftBodyObject extends GameObject {
   }
 
   /**
-   * for a soft body x and y will be the top left of the bounding box 
-   * @param {{ color: string, height: number, width: number; x: number; y: number; z_index: number; points: {x: number; y: number}[] }} param0 
+   * @type {number}
    */
-  constructor({ color, x, y, z_index, points }) {
+  k_constant;
+
+  /**
+   * @type {number}
+   */
+  mass;
+
+  /**
+   * @type {SoftBodySpring[]}
+   */
+  springs = [];
+
+  /**
+   * for a soft body x and y will be the top left of the bounding box 
+   * @param {{ color: string, height: number, width: number; x: number; y: number; z_index: number; points: {x: number; y: number}[]; mass: number; k_constant: number }} param0 
+   */
+  constructor({ color, x, y, z_index, points, mass, k_constant }) {
     super({ color, height: null, width: null, x, y, z_index });
+    this.mass = mass;
+    this.k_constant = k_constant;
     for (const p of points) {
       this.points.push(
         new SoftBodyPoint(p.x + x, p.y + y)
@@ -26,17 +43,24 @@ class SoftBodyObject extends GameObject {
   }
 
   onLoad() {
-    // set initial distances to points
-    for (const point of this.points) {
-      for (const p of this.points.filter(v => v.x !== point.x && v.y !== point.y)) {
-        point.distToOtherPoints.push(
-          { x: p.x - point.x, y: p.y - point.y },
+    // there should be a spring between every two points
+    const first = this.points[0];
+    const last = this.points[this.points.length - 1];
+
+    for (let inc = 1; inc < this.points.length - 1; inc++) {
+      for (let i = 0; i < this.points.length - inc; i += 1) {
+        const p1 = this.points[i];
+        const p2 = this.points[i + inc];
+
+        this.springs.push(
+          new SoftBodySpring(
+            [p1, p2], this.k_constant
+          )
         )
       }
     }
 
-    console.log(this.points);
-
+    this.springs.push(new SoftBodySpring([last, first], this.k_constant));
     this.updateBoundingBox();
   }
 
@@ -64,6 +88,43 @@ class SoftBodyObject extends GameObject {
 
   onRender() {
     super.onRender();
+    /**
+     * @type {SoftBody}
+     */
+    const sb = this.getScript(SoftBody);
+    if (sb.fixed) return;
+    for (const spring of this.springs) {
+      const p1 = this.points.find(v => v.x === spring.points[0].x && v.y === spring.points[0].y);
+      const p2 = this.points.find(v => v.x === spring.points[1].x && v.y === spring.points[1].y);
+
+      spring.updatePoints(p1.x, p1.y, p2.x, p2.y);;
+
+      const force_total = spring.calculateForce();
+
+      if (force_total == 0) continue;
+      const height = Math.abs(p2.y - p1.y);
+      const length = spring.positionDifference;
+
+      const angle = Math.asin(height / length);
+
+      // technically these are accelerations....
+      const y_f = Math.sin(angle) * force_total / this.mass;
+      const x_f = Math.cos(angle) * force_total / this.mass;
+
+
+      const p1v_x = (p2.x - p1.x === Math.abs(p2.x - p1.x)) ? -x_f : x_f;
+      const p1v_y = (p2.y - p1.y === Math.abs(p2.y - p1.y)) ? -y_f : y_f
+
+      const p2v_x = (p2.x - p1.x === Math.abs(p2.x - p1.x)) ? x_f : -x_f;
+      const p2v_y = (p2.y - p1.y === Math.abs(p2.y - p1.y)) ? y_f : -y_f;
+
+      p1.velocity.add(p1v_x, p1v_y);
+      p2.velocity.add(p2v_x, p2v_y);
+    }
+
+
   }
+
+
 
 }

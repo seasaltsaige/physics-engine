@@ -74,31 +74,30 @@ class GameManager {
 
       const ctx = GameManager.ctx;
 
-      ctx.strokeStyle = "red";
-      ctx.lineWidth = 3;
-      // ctx.moveTo(object.x, object.y);
-      ctx.beginPath();
-      ctx.moveTo(obj.boundingBox.top_left.x, obj.boundingBox.top_left.y);
-      ctx.lineTo(obj.boundingBox.top_right.x, obj.boundingBox.top_right.y);
-      ctx.lineTo(obj.boundingBox.bottom_right.x, obj.boundingBox.bottom_right.y);
-      ctx.lineTo(obj.boundingBox.bottom_left.x, obj.boundingBox.bottom_left.y);
-      ctx.lineTo(obj.boundingBox.top_left.x, obj.boundingBox.top_left.y);
+      // ctx.strokeStyle = "red";
+      // ctx.lineWidth = 3;
+      // // ctx.moveTo(object.x, object.y);
+      // ctx.beginPath();
+      // ctx.moveTo(obj.boundingBox.top_left.x, obj.boundingBox.top_left.y);
+      // ctx.lineTo(obj.boundingBox.top_right.x, obj.boundingBox.top_right.y);
+      // ctx.lineTo(obj.boundingBox.bottom_right.x, obj.boundingBox.bottom_right.y);
+      // ctx.lineTo(obj.boundingBox.bottom_left.x, obj.boundingBox.bottom_left.y);
+      // ctx.lineTo(obj.boundingBox.top_left.x, obj.boundingBox.top_left.y);
 
-      ctx.closePath();
-      ctx.stroke();
+      // ctx.closePath();
+      // ctx.stroke();
 
       ctx.fillStyle = obj.color;
 
       for (const p of obj.points) {
         ctx.beginPath();
-
         ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
         ctx.fill();
         ctx.closePath();
       }
 
       ctx.beginPath();
-      ctx.lineWidth = 1;
+      ctx.lineWidth = 1.5;
       ctx.strokeStyle = obj.color;
       ctx.moveTo(obj.points[0].x, obj.points[0].y);
       for (let i = 1; i < obj.points.length; i++) {
@@ -107,7 +106,8 @@ class GameManager {
       }
       ctx.lineTo(obj.points[0].x, obj.points[0].y);
       ctx.closePath();
-      ctx.stroke();
+      ctx.fill();
+
 
 
       // object.screen_x = object.x + GameManager.screenPos.x;

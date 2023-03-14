@@ -8,23 +8,47 @@ window.onload = () => {
 
   const ctx = Window.getContext("2d");
 
+
+  const circlePoints = [];
+  const pAmmount = 3;
+  const step = Math.PI * 2 / pAmmount;
+
+  for (let i = 2; i < Math.PI * 2 + 2; i += step) {
+    const x = Math.cos(i) * 70;
+    const y = Math.sin(i) * 70;
+    circlePoints.push({ x, y });
+  }
+
+  // have to make both objects points react
+
   const soft = new SoftBodyObject({
     color: "black",
-    x: 500,
+    x: 800,
     y: 200,
-    //----
-    points: [
-      { x: 23, y: 0 },
-      { x: 100, y: 20 },
-      { x: 150, y: 125 },
-      { x: 0, y: 100 },
-    ],
-    z_index: 100,
+    points: circlePoints,
+    mass: 50,
+    k_constant: 10,
+    z_index: 1,
   });
 
   soft.appendScripts([
-    new SoftBody(soft, { fixed: false }),
+    new SoftBody(soft, { fixed: false, elasticity: 0.575 }),
     new SoftBodyCollider(soft),
+  ]);
+
+  const soft2 = new SoftBodyObject({
+    color: "black",
+    x: 800,
+    y: Window.height * 2 / 3 - 100,
+    points: circlePoints,
+    mass: 50,
+    k_constant: 10,
+    z_index: 1,
+  });
+
+  soft2.appendScripts([
+    new SoftBody(soft2, { fixed: false, elasticity: 0.575 }),
+    new SoftBodyCollider(soft2),
   ]);
 
   // const block = new Square({
@@ -49,11 +73,11 @@ window.onload = () => {
     color: "brown",
     points: [
       { x: 0, y: 0 },
-      { x: Window.width, y: 0 },
-      { x: Window.width, y: 50 },
+      { x: Window.width, y: -50 },
+      { x: Window.width + 50, y: 50 },
       { x: 0, y: 50 },
-
-    ]
+    ],
+    mass: 100,
   });
 
   floor.appendScripts([
@@ -77,6 +101,7 @@ window.onload = () => {
   GameManager.width = Window.width;
   GameManager.height = Window.height;
   GameManager.addObject(soft);
+  GameManager.addObject(soft2);
   // GameManager.addObject(block);
   GameManager.addObject(floor);
   // GameManager.addObject(floor2);
