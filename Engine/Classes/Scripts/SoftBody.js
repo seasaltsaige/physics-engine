@@ -35,6 +35,11 @@ class SoftBody extends Script {
 
   run() {
 
+    // TODO: If parent is fixed, fix bounding box origin, not points, hopefully should make fixed objects be able
+    // to jiggle
+
+
+    // This will move to allow collision
     if (this.fixed) return;
 
     /**
@@ -44,7 +49,6 @@ class SoftBody extends Script {
     if (collider !== null) {
       collider.collisionCheck();
     }
-
     for (const p of this.parent.points) {
       p.velocity.add(0, this.gravity);
       p.x += p.velocity.x;

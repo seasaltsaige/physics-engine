@@ -8,151 +8,30 @@ window.onload = () => {
 
   const ctx = Window.getContext("2d");
 
-
-  const rect = new SoftBodyObject({
-    color: "black",
-    x: 100,
-    y: 100,
-    points: [
-      { y: 0, x: 200 },
-      { y: 100, x: 200 },
-      { y: 200, x: 200 },
-      { y: 300, x: 200 },
-      { y: 400, x: 200 },
-      { y: 500, x: 200 },
-      { y: 600, x: 200 },
-      { y: 600, x: 100 },
-      { y: 500, x: 100 },
-      { y: 400, x: 100 },
-      { y: 300, x: 100 },
-      { y: 200, x: 100 },
-      { y: 100, x: 100 },
-      { y: 0, x: 100 },
-    ],
-    mass: 400,
-    k_constant: 60,
-    z_index: 1,
-  });
-
+  const rect = makeRect(120, 300, 2, 2, 100, 100);
   rect.appendScripts([
-    new SoftBody(rect, { fixed: false, elasticity: 0.8 }),
+    new SoftBody(rect, { fixed: false, elasticity: 0.8, }),
     new SoftBodyCollider(rect),
   ]);
 
-  const circlePoints = [];
-  const pAmmount = 3;
-  const step = Math.PI * 2 / pAmmount;
-
-  for (let i = 2; i < Math.PI * 2 + 2; i += step) {
-    const x = Math.cos(i) * 70;
-    const y = Math.sin(i) * 70;
-    circlePoints.push({ x, y });
-  }
-  //------------------
-  // // have to make both objects points react
-  //------------------
-  const soft = new SoftBodyObject({
-    color: "black",
-    x: 800,
-    y: 200,
-    points: circlePoints,
-    mass: 50,
-    k_constant: 10,
-    z_index: 1,
-  });
-
-  soft.appendScripts([
-    new SoftBody(soft, { fixed: false, elasticity: 0.575 }),
-    new SoftBodyCollider(soft),
+  const rect2 = makeRect(100, -100, 2, 2, 100, 100);
+  rect2.appendScripts([
+    new SoftBody(rect2, { fixed: false, elasticity: 0.8, }),
+    new SoftBodyCollider(rect2),
   ]);
 
 
-  const soft2 = new SoftBodyObject({
-    color: "black",
-    x: 400,
-    y: 400,
-    points: circlePoints,
-    mass: 50,
-    k_constant: 10,
-    z_index: 1,
-  });
 
-  soft2.appendScripts([
-    new SoftBody(soft2, { fixed: false, elasticity: 0.575 }),
-    new SoftBodyCollider(soft2),
-  ]);
+  const floor = makeRect(0, Window.height * 2 / 3, 5, 3, Window.width / 4, 50);
 
-
-  // const soft2 = new SoftBodyObject({
-  //   color: "black",
-  //   x: 800,
-  //   y: Window.height * 2 / 3 - 100,
-  //   points: circlePoints,
-  //   mass: 50,
-  //   k_constant: 10,
-  //   z_index: 1,
-  // });
-
-  // soft2.appendScripts([
-  //   new SoftBody(soft2, { fixed: false, elasticity: 0.575 }),
-  //   new SoftBodyCollider(soft2),
-  // ]);
-
-  // const block = new Square({
-  //   x: Window.width / 2,
-  //   y: 100,
-  //   width: 100,
-  //   height: 100,
-  //   z_index: 100,
-  //   color: "grey"
-  // });
-
-  // block.appendScripts([
-  //   new RigidBody(block),
-  //   new Collider(block),
-  //   new Player(block),
-  // ]);
-
-  const floor = new SoftBodyObject({
-    x: 0,
-    y: Window.height * 2 / 3 - 50,
-    z_index: 1,
-    color: "brown",
-    points: [
-      { x: 0, y: 0 },
-      { x: Window.width, y: -300 },
-      { x: Window.width + 50, y: 50 },
-      { x: 0, y: 50 },
-    ],
-    mass: 1,
-    k_constant: 1,
-  });
-
-  floor.appendScripts([
-    new SoftBody(floor, { fixed: true }),
-    new SoftBodyCollider(floor),
-  ]);
-
-  // const floor2 = new Square({
-  //   x: Window.width / 2,
-  //   y: Window.height * 2 / 3 - 225,
-  //   height: 50,
-  //   width: 300,
-  //   z_index: 1,
-  //   color: "brown",
-  // });
-  // floor2.appendScripts([
-  //   new Collider(floor2),
-  // ]);
 
   GameManager.ctx = ctx;
   GameManager.width = Window.width;
   GameManager.height = Window.height;
   GameManager.addObject(rect);
-  GameManager.addObject(soft);
-  GameManager.addObject(soft2);
+  GameManager.addObject(rect2);
+
   GameManager.addObject(floor);
-  // GameManager.addObject(floor2);
 
   renderLoop();
 }
@@ -161,5 +40,46 @@ window.onload = () => {
 function renderLoop() {
   setInterval(() => {
     GameManager.render();
-  }, 10);
+  }, 120);
+}
+
+
+/**
+ * 
+ * @param {number} x 
+ * @param {number} y 
+ * @param {number} w_count 
+ * @param {number} h_count 
+ * @param {number} spacing_x
+ * @param {number} spacing_y
+ */
+function makeRect(x, y, w_count, h_count, spacing_x, spacing_y) {
+  /**
+   * @type {{x: number, y: number}[]}
+   */
+  const points = [];
+
+
+  for (let h = 0; h < h_count; h++) {
+    for (let w = 0; w < w_count; w++) {
+      points.push({
+        x: w * spacing_x, y: h * spacing_y,
+      });
+    }
+  }
+
+
+  const rect = new SoftBodyObject({
+    color: "gold",
+    mass: 50,
+    k_constant: 5,
+    points_x_amm: w_count,
+    points_y_amm: h_count,
+    points,
+    x,
+    y,
+    z_index: 1,
+  });
+
+  return rect;
 }

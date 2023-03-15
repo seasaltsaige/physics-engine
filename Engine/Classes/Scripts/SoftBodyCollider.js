@@ -18,59 +18,71 @@ class SoftBodyCollider extends Script {
      * @type {SoftBodyObject[]}
      */
     const otherObjects = GameManager.objects.filter((v) => v.id !== this.parent.id && v instanceof SoftBodyObject);
+
     for (const obj of otherObjects) {
 
       for (const point of this.parent.points) {
         // console.log(point);
+        const boundsCheck = this.pointInBoundingBox(point, obj);
+        if (!boundsCheck) continue;
+
         const { x: p, y: q } = point;
-        const { x: r, y: s } = this.getPoint(point);
+        const { x: r, y: s } = this.getPoint(point, obj);
+
+        let { closest_x, closest_y } = { closest_x: Infinity, closest_y: Infinity };
+        let { x1_collided, y1_collided } = { x1_collided: null, y1_collided: null };
+        let { x2_collided, y2_collided } = { x1_collided: null, y1_collided: null };
 
         //   // If collided
         //   // check point outside of bounding box
         //   // if line to that point intersects with an odd number of lines of the other object, it is collided
 
-        // ONLY UPDATE IF DISTANCE IS CLOSER
-        let { closest_x, closest_y } = { closest_x: 100000000, closest_y: 100000000 };
-        // GOTTA MAKE THESE TWO POINTS REACT AS WELL
-        // IF THE PLATFORM IS FIXED, HOPEFULLY IT DOESNT FREAK OUT
-        let { x1_collided, y1_collided } = { x1_collided: null, y1_collided: null };
-        let { x2_collided, y2_collided } = { x1_collided: null, y1_collided: null };
 
-        let collided = false;
-        if (obj.points.length % 2 === 0) {
-          for (let i = 0; i < obj.points.length - 2; i += 2) {
-            const { x: x1, y: y1 } = obj.points[i];
-            const { x: x2, y: y2 } = obj.points[i + 1];
-            if (this.intersects({ a: x1, b: y1 }, { c: x2, d: y2 }, { p, q }, { r, s })) {
-              collided = true;
-              const closest = this.closest_point(x1, y1, x2, y2, p, q);
-              if (this.distance(p, q, closest_x, closest_y) > this.distance(p, q, closest.x, closest.y)) {
-                closest_x = closest.x;
-                closest_y = closest.y;
+        let collided = 0;
+        for (let i = 0; i < obj.points.length - 1; i += 1) {
+          const { x: x1, y: y1 } = obj.points[i];
+          const { x: x2, y: y2 } = obj.points[i + 1];
+          if (this.intersects({ a: x1, b: y1 }, { c: x2, d: y2 }, { p, q }, { r, s }))
+            collided++;
+        }
 
-                x1_collided = x1;
-                y1_collided = y1;
-                x2_collided = x2;
-                y2_collided = y2;
-              }
+        if (collided % 2 !== 0) {
+          // ONLY UPDATE IF DISTANCE IS CLOSER
+
+          // loop through every pair of points (in order)
+          for (let j = 0; j < obj.points.length - 1; j++) {
+            // The two points that create a line
+            const { x: x1, y: y1 } = obj.points[j];
+            const { x: x2, y: y2 } = obj.points[j + 1];
+
+            const newClosest = this.closest_point(x1, y1, x2, y2, p, q);
+
+            const { x: newX, y: newY } = newClosest;
+            if (this.distance(p, q, newX, newY) < this.distance(p, q, closest_x, closest_y)) {
+              closest_x = newX;
+              closest_y = newY;
+
+              x1_collided = x1;
+              x2_collided = x2;
+              y1_collided = y1;
+              y2_collided = y2;
+
             }
 
           }
 
-        }
 
-        if (collided) {
+          // TODO: Based on point mass, move parent point, and BOTH points on the obj edge
 
-          const { halfx, halfy } = { halfx: Math.abs(closest_x + point.x) / 2, halfy: Math.abs(closest_y + point.y) / 2 }
-
-          point.x = halfx;
-          point.y = halfy;
+          point.x = closest_x;
+          point.y = closest_y;
 
           /**
            * @type {SoftBody}
            */
           const sb = this.parent.getScript(SoftBody);
           if (sb !== null) {
+
             const height = Math.abs(y2_collided - y1_collided);
             const length = this.distance(x1_collided, y1_collided, x2_collided, y2_collided);
             const angle = Math.asin(height / length);
@@ -79,7 +91,11 @@ class SoftBodyCollider extends Script {
 
             let newXVel = Math.cos(angle - Math.PI / 2);
             if (y2_collided < y1_collided) newXVel = -newXVel;
-            const newYVel = Math.sin(Math.PI / 2 - angle);
+            let newYVel = Math.sin(Math.PI / 2 - angle);
+
+            // If upsidedown
+            if (sb.gravity !== Math.abs(sb.gravity))
+              newYVel = -newYVel;
 
             point.velocity.set(newXVel * curVelocityMAG * sb.elasticity, -newYVel * curVelocityMAG * sb.elasticity);
           }
@@ -88,9 +104,6 @@ class SoftBodyCollider extends Script {
             p.velocity.set(p.velocity.x * 0.91, p.velocity.y * 0.91)
           }
         }
-
-
-        //   // make not collided
       }
     }
   }
@@ -149,15 +162,39 @@ class SoftBodyCollider extends Script {
 
   }
 
+
+  // UPDATE TO GET CLOSEST POINT ON BOUNDING
   /**
    * @param {SoftBodyPoint} point
    * @returns 
    */
-  getPoint(point) {
+  getPoint(point, obj) {
     return {
       x: point.x,
-      y: this.parent.boundingBox.top_left.y - 20,
+      y: obj.boundingBox.top_left.y - 20,
     }
+  }
+
+
+  /**
+   * 
+   * @param {SoftBodyPoint} point The point being evaluated
+   * @param {SoftBodyObject} obj The object to check the bounding box of
+   */
+  pointInBoundingBox(point, obj) {
+    const bounds = obj.boundingBox;
+    const { x, y } = point;
+
+    if (
+      x >= bounds.top_left.x &&
+      x <= bounds.top_right.x &&
+      y >= bounds.top_left.y &&
+      y <= bounds.bottom_left.y
+    )
+      return true;
+
+    else return false;
+
   }
 
 }
