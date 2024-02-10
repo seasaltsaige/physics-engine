@@ -40,7 +40,7 @@ window.onload = () => {
 function renderLoop() {
   setInterval(() => {
     GameManager.render();
-  }, 120);
+  }, 10);
 }
 
 
