@@ -1,45 +1,46 @@
-window.onload = () => {
-  /**
-   * @type {HTMLCanvasElement}
-   */
-  const Window = document.getElementsByTagName("canvas")[0];
-  Window.width = window.outerWidth;
-  Window.height = window.outerHeight;
+// window.onload = () => {
+/**
+ * @type {HTMLCanvasElement}
+ */
+const Window = document.getElementsByTagName("canvas")[0];
+Window.width = window.outerWidth;
+Window.height = window.outerHeight;
 
-  const ctx = Window.getContext("2d");
+const ctx = Window.getContext("2d");
 
-  const rect = makeRect(120, 300, 2, 2, 100, 100);
-  rect.appendScripts([
-    new SoftBody(rect, { fixed: false, elasticity: 0.8, }),
-    new SoftBodyCollider(rect),
-  ]);
+const rect = makeRect(400, 300, 2, 2, 100, 100);
+rect.appendScripts([
+  new SoftBody(rect, { fixed: false, elasticity: 0.5, }),
+  new SoftBodyCollider(rect),
+]);
 
-  const rect2 = makeRect(100, -100, 2, 2, 100, 100);
-  rect2.appendScripts([
-    new SoftBody(rect2, { fixed: false, elasticity: 0.8, }),
-    new SoftBodyCollider(rect2),
-  ]);
-
-
-
-  const floor = makeRect(0, Window.height * 2 / 3, 5, 3, Window.width / 4, 50);
+const rect2 = makeRect(100, -100, 2, 2, 100, 100);
+rect2.appendScripts([
+  new SoftBody(rect2, { fixed: false, elasticity: 0.8, }),
+  new SoftBodyCollider(rect2),
+]);
 
 
-  GameManager.ctx = ctx;
-  GameManager.width = Window.width;
-  GameManager.height = Window.height;
-  GameManager.addObject(rect);
-  GameManager.addObject(rect2);
 
-  GameManager.addObject(floor);
+const floor = makeRect(0, Window.height * 2 / 3, 5, 3, Window.width / 4, 50);
 
-  renderLoop();
-}
+
+GameManager.ctx = ctx;
+GameManager.width = Window.width;
+GameManager.height = Window.height;
+GameManager.addObject(rect);
+GameManager.addObject(rect2);
+
+GameManager.addObject(floor);
+
+renderLoop();
+// }
 
 
 function renderLoop() {
   setInterval(() => {
     GameManager.render();
+    console.log("hello?")
   }, 10);
 }
 
